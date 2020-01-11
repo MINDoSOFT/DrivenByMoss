@@ -19,7 +19,7 @@ import java.util.UUID;
  */
 public class MaschineJamControllerDefinition extends DefaultControllerDefinition
 {
-    private static final UUID EXTENSION_ID = UUID.fromString ("E87516A3-5401-44B1-9952-B4F821ED3DD5");
+    private static final UUID EXTENSION_ID = UUID.fromString ("63AC1E45-B59D-4817-9F7B-8704559B4D27");
 
 
     /**
