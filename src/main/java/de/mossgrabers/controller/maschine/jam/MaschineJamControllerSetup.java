@@ -6,6 +6,7 @@ package de.mossgrabers.controller.maschine.jam;
 
 import de.mossgrabers.controller.maschine.jam.controller.MaschineJamColorManager;
 import de.mossgrabers.controller.maschine.jam.controller.MaschineJamControlSurface;
+import de.mossgrabers.controller.maschine.jam.view.PlayView;
 import de.mossgrabers.controller.maschine.jam.view.SceneView;
 import de.mossgrabers.controller.maschine.mikro.mk3.command.continuous.TouchstripCommand;
 import de.mossgrabers.controller.maschine.mikro.mk3.command.trigger.AddDeviceCommand;
@@ -23,7 +24,6 @@ import de.mossgrabers.controller.maschine.mikro.mk3.view.DrumView;
 import de.mossgrabers.controller.maschine.mikro.mk3.view.MuteView;
 import de.mossgrabers.controller.maschine.mikro.mk3.view.NoteRepeatView;
 import de.mossgrabers.controller.maschine.mikro.mk3.view.ParameterView;
-import de.mossgrabers.controller.maschine.mikro.mk3.view.PlayView;
 import de.mossgrabers.controller.maschine.mikro.mk3.view.SelectView;
 import de.mossgrabers.controller.maschine.mikro.mk3.view.SoloView;
 import de.mossgrabers.framework.command.continuous.KnobRowModeCommand;
@@ -171,13 +171,16 @@ public class MaschineJamControllerSetup extends AbstractControllerSetup<Maschine
     @Override
     protected void createModes ()
     {
-    	/*
         final MaschineJamControlSurface surface = this.getSurface ();
         final ModeManager modeManager = surface.getModeManager ();
 
+        modeManager.registerMode (Modes.VOLUME, new SelectedVolumeMode<> (surface, this.model));
+        
+        modeManager.setDefaultMode (Modes.VOLUME);
+        
+        /*
         modeManager.registerMode (Modes.BROWSER, new BrowseMode (surface, this.model));
 
-        modeManager.registerMode (Modes.VOLUME, new SelectedVolumeMode<> (surface, this.model));
         modeManager.registerMode (Modes.PAN, new SelectedPanMode<> (surface, this.model));
         for (int i = 0; i < 8; i++)
             modeManager.registerMode (Modes.get (Modes.SEND1, i), new SelectedSendMode<> (i, surface, this.model));
@@ -187,7 +190,6 @@ public class MaschineJamControllerSetup extends AbstractControllerSetup<Maschine
 
         modeManager.registerMode (Modes.DEVICE_PARAMS, new SelectedDeviceMode<> (surface, this.model));
 
-        modeManager.setDefaultMode (Modes.VOLUME);
         */
     }
 
@@ -199,12 +201,12 @@ public class MaschineJamControllerSetup extends AbstractControllerSetup<Maschine
         final MaschineJamControlSurface surface = this.getSurface ();
         final ViewManager viewManager = surface.getViewManager ();
 
+        viewManager.registerView (Views.PLAY, new PlayView (surface, this.model));
         viewManager.registerView (Views.SCENE_PLAY, new SceneView (surface, this.model));
         
         /*
         viewManager.registerView (Views.CLIP, new ClipView (surface, this.model));
 
-        viewManager.registerView (Views.PLAY, new PlayView (surface, this.model));
         viewManager.registerView (Views.DRUM, new DrumView (surface, this.model));
 
         viewManager.registerView (Views.DEVICE, new ParameterView (surface, this.model));
@@ -418,9 +420,14 @@ public class MaschineJamControllerSetup extends AbstractControllerSetup<Maschine
     {
         super.flush ();
 
+        /* 
+         * Caused a null pointer java.lang.NullPointerException
+    at de.mossgrabers.controller.maschine.jam.MaschineJamControllerSetup.flush(MaschineJamControllerSetup.java:421)
+    at de.mossgrabers.bitwig.framework.extension.GenericControllerExtension.flush(GenericControllerExtension.java:63)
         final TouchstripCommand command = (TouchstripCommand) this.getSurface ().getContinuous (ContinuousID.CROSSFADER).getCommand ();
         if (command != null)
             command.updateValue ();
+        */
     }
 
 
