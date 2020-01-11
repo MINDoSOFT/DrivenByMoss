@@ -9,14 +9,14 @@ import de.mossgrabers.bitwig.framework.configuration.SettingsUIImpl;
 import de.mossgrabers.bitwig.framework.daw.HostImpl;
 import de.mossgrabers.bitwig.framework.extension.AbstractControllerExtensionDefinition;
 import de.mossgrabers.controller.maschine.jam.MaschineJamControllerDefinition;
-import de.mossgrabers.controller.maschine.mikro.mk3.MaschineMikroMk3ControllerSetup;
+import de.mossgrabers.controller.maschine.jam.MaschineJamControllerSetup;
 import de.mossgrabers.framework.controller.IControllerSetup;
 
 import com.bitwig.extension.controller.api.ControllerHost;
 
 
 /**
- * Definition class for the NI Maschine Mikro Mk3 controller.
+ * Definition class for the NI Maschine Jam controller.
  *
  * @author J&uuml;rgen Mo&szlig;graber
  */
@@ -35,6 +35,6 @@ public class MaschineJamExtensionDefinition extends AbstractControllerExtensionD
     @Override
     protected IControllerSetup<?, ?> getControllerSetup (final ControllerHost host)
     {
-        return new MaschineMikroMk3ControllerSetup (new HostImpl (host), new BitwigSetupFactory (host), new SettingsUIImpl (host.getPreferences ()), new SettingsUIImpl (host.getDocumentState ()));
+        return new MaschineJamControllerSetup (new HostImpl (host), new BitwigSetupFactory (host), new SettingsUIImpl (host.getPreferences ()), new SettingsUIImpl (host.getDocumentState ()));
     }
 }
