@@ -95,7 +95,7 @@ public class MaschineJamControlSurface extends AbstractControlSurface<MaschineJa
      */
     public MaschineJamControlSurface (final IHost host, final ColorManager colorManager, final MaschineJamConfiguration configuration, final IMidiOutput output, final IMidiInput input)
     {
-        super (host, configuration, colorManager, output, input, new PadGridImpl (colorManager, output, 4, 4, 36), 800, 440);
+        super (host, configuration, colorManager, output, input, new PadGridImpl (colorManager, output, 8, 8, 22), 800, 800);
     }
 
 

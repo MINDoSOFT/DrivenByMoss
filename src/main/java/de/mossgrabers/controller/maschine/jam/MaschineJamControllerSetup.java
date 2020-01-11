@@ -87,15 +87,17 @@ public class MaschineJamControllerSetup extends AbstractControllerSetup<Maschine
     {
          0,  1,  2,  3,  4,  5,  6,  7,
          8,  9, 10, 11, 12, 13, 14, 15,
-        -1, -1, -1, -1, -1, -1, -1, -1,
-        -1, -1, -1, -1, -1, -1, -1, -1,
-        -1, -1, -1, -1, -1, -1, -1, -1,
-        -1, -1, -1, -1, -1, -1, -1, -1,
-        -1, -1, -1, -1, -1, -1, -1, -1,
-        -1, -1, -1, -1, -1, -1, -1, -1
+        16, 17, 18, 19, 20, 21, 22, 23,
+        24, 25, 26, 27, 28, 29, 30, 31,
+        32, 33, 34, 35, 36, 37, 38, 39,
+        40, 41, 42, 43, 44, 45, 46, 47,
+        48, 49, 50, 51, 52, 53, 54, 55,
+        56, 57, 58, 59, 60, 61, 62, 63
     };
     // @formatter:on
 
+    private static final int NUM_OF_TRACK_BUTTONS = 8;
+    private static final int NUM_OF_SENDS = 8;
 
     /**
      * Constructor.
@@ -118,7 +120,7 @@ public class MaschineJamControllerSetup extends AbstractControllerSetup<Maschine
     @Override
     protected void createScales ()
     {
-        this.scales = new Scales (this.valueChanger, 36, 52, 4, 4);
+        this.scales = new Scales (this.valueChanger, 22, 86, 8, 8);
         this.scales.setDrumMatrix (DRUM_MATRIX);
     }
 
@@ -128,11 +130,11 @@ public class MaschineJamControllerSetup extends AbstractControllerSetup<Maschine
     protected void createModel ()
     {
         final ModelSetup ms = new ModelSetup ();
-        ms.setNumTracks (16);
-        ms.setNumDevicesInBank (16);
-        ms.setNumScenes (16);
-        ms.setNumSends (8);
-        ms.setNumParams (16);
+        ms.setNumTracks (NUM_OF_TRACK_BUTTONS);
+        ms.setNumDevicesInBank (8);
+        ms.setNumScenes (8);
+        ms.setNumSends (NUM_OF_SENDS);
+        ms.setNumParams (8);
         this.model = this.factory.createModel (this.colorManager, this.valueChanger, this.scales, ms);
         final ITrackBank trackBank = this.model.getTrackBank ();
         trackBank.setIndication (true);
@@ -464,13 +466,13 @@ public class MaschineJamControllerSetup extends AbstractControllerSetup<Maschine
         final int selIndex = selectedTrack == null ? -1 : selectedTrack.getIndex ();
 
         final ICursorDevice cursorDevice = this.model.getCursorDevice ();
-        for (int i = 0; i < 16; i++)
+        for (int i = 0; i < NUM_OF_TRACK_BUTTONS; i++)
         {
             final ITrack track = tb.getItem (i);
             track.setVolumeIndication (selIndex == i && !isEffect && isVolume);
             track.setPanIndication (selIndex == i && !isEffect && isPan);
             final ISendBank sendBank = track.getSendBank ();
-            for (int j = 0; j < 8; j++)
+            for (int j = 0; j < NUM_OF_SENDS; j++)
                 sendBank.getItem (j).setIndication (selIndex == i && !isEffect && (Modes.SEND1.equals (mode) && j == 0 || Modes.SEND2.equals (mode) && j == 1 || Modes.SEND3.equals (mode) && j == 2 || Modes.SEND4.equals (mode) && j == 3 || Modes.SEND5.equals (mode) && j == 4 || Modes.SEND6.equals (mode) && j == 5 || Modes.SEND7.equals (mode) && j == 6 || Modes.SEND8.equals (mode) && j == 7));
 
             if (tbe != null)
