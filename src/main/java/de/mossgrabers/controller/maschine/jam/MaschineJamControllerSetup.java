@@ -4,6 +4,9 @@
 
 package de.mossgrabers.controller.maschine.jam;
 
+import java.util.function.BooleanSupplier;
+
+import de.mossgrabers.controller.maschine.jam.command.trigger.JamMetronomeCommand;
 import de.mossgrabers.controller.maschine.jam.controller.MaschineJamColorManager;
 import de.mossgrabers.controller.maschine.jam.controller.MaschineJamControlSurface;
 import de.mossgrabers.controller.maschine.jam.view.PlayView;
@@ -234,6 +237,19 @@ public class MaschineJamControllerSetup extends AbstractControllerSetup<Maschine
         // Transport
         this.addButton (ButtonID.PLAY, "Play", new PlayCommand<> (this.model, surface), MaschineJamControlSurface.JAM_PLAY, t::isPlaying);
         this.addButton (ButtonID.RECORD, "Record", new RecordCommand<> (this.model, surface), MaschineJamControlSurface.JAM_REC, t::isRecording);
+        
+        
+        // Shift commands
+        BooleanSupplier booleanSupplier = new BooleanSupplier() {
+			
+			@Override
+			public boolean getAsBoolean() {
+				return surface.isJamShiftPressed() && t.isMetronomeOn();
+			}
+		};
+		
+        this.addButton (ButtonID.METRONOME, "Metronome", new JamMetronomeCommand<> (this.model, surface), MaschineJamControlSurface.JAM_LEFT, booleanSupplier);
+        
         /*
         this.addButton (ButtonID.STOP, "Stop", new MaschineStopCommand (this.model, surface), MaschineJamControlSurface.JAM_STOP, () -> !t.isPlaying ());
         this.addButton (ButtonID.LOOP, "Loop", new ToggleLoopCommand<> (this.model, surface), MaschineJamControlSurface.JAM_RESTART, t::isLoop);

@@ -5,12 +5,17 @@
 package de.mossgrabers.controller.maschine.jam.controller;
 
 import de.mossgrabers.controller.maschine.jam.MaschineJamConfiguration;
+import de.mossgrabers.controller.push.controller.PaletteEntry;
 import de.mossgrabers.framework.controller.AbstractControlSurface;
+import de.mossgrabers.framework.controller.ButtonID;
 import de.mossgrabers.framework.controller.color.ColorManager;
 import de.mossgrabers.framework.controller.grid.PadGridImpl;
 import de.mossgrabers.framework.daw.IHost;
+import de.mossgrabers.framework.daw.midi.DeviceInquiry;
 import de.mossgrabers.framework.daw.midi.IMidiInput;
 import de.mossgrabers.framework.daw.midi.IMidiOutput;
+import de.mossgrabers.framework.daw.midi.MidiSysExCallback;
+import de.mossgrabers.framework.utils.StringUtils;
 
 
 /**
@@ -82,7 +87,58 @@ public class MaschineJamControlSurface extends AbstractControlSurface<MaschineJa
 
 
     private int             ribbonValue              = -1;
+    private boolean 		jamShiftValue = false;
 
+    
+    private static final int []    SYSEX_SHIFT_ON                  =
+        {
+                0xF0,
+                0x00,
+                0x21,
+                0x09,
+                0x15,
+                0x00,
+                0x4D,
+                0x50,
+                0x00,
+                0x01,
+                0x4D,
+                0x01,
+                0xF7
+        };
+    private static final int []    SYSEX_SHIFT_OFF                  =
+        {
+                0xF0,
+                0x00,
+                0x21,
+                0x09,
+                0x15,
+                0x00,
+                0x4D,
+                0x50,
+                0x00,
+                0x01,
+                0x4D,
+                0x00,
+                0xF7
+        };
+    // Don't know what button sends this sysex is but should trigger mode and controls update
+    private static final int []    SYSEX_UNKNOWN                  =
+        {
+            0xF0,
+            0x00,
+            0x21,
+            0x09,
+            0x15,
+            0x00,
+            0x4D,
+            0x50,
+            0x00,
+            0x01,
+            0x46,
+            0x01,
+            0xF7
+        };
 
     /**
      * Constructor.
@@ -96,8 +152,11 @@ public class MaschineJamControlSurface extends AbstractControlSurface<MaschineJa
     public MaschineJamControlSurface (final IHost host, final ColorManager colorManager, final MaschineJamConfiguration configuration, final IMidiOutput output, final IMidiInput input)
     {
         super (host, configuration, colorManager, output, input, new PadGridImpl (colorManager, output, 8, 8, 22), 800, 800);
+     
+        this.host.println("HandleSysEx callback registered");
+        this.input.setSysexCallback (this::handleSysEx);
     }
-
+    
 
     /** {@inheritDoc} */
     @Override
@@ -118,5 +177,55 @@ public class MaschineJamControlSurface extends AbstractControlSurface<MaschineJa
             return;
         this.ribbonValue = value;
         this.output.sendCC (1, value);
+    }
+    
+    /**
+     * Handle incoming sysex data.
+     *
+     * @param data The data
+     */
+    private void handleSysEx (final String data)
+    {
+    	this.host.println("HandleSysEx");
+        final int [] byteData = StringUtils.fromHexStr (data);
+        this.host.println("Sysex: " + data);
+
+        if (isShiftOn(byteData)) this.jamShiftValue = true;
+        if (isShiftOff(byteData)) this.jamShiftValue = false;
+        if (isUnknownOn(byteData)) ; // FIXME: Trigger a refresh ?
+    }
+    
+    private static boolean isShiftOn (final int [] data)
+    {
+        return isSysex(data, SYSEX_SHIFT_ON);
+    }
+    
+    private static boolean isShiftOff (final int [] data)
+    {
+        return isSysex(data, SYSEX_SHIFT_OFF);
+    }
+    
+    private static boolean isUnknownOn (final int [] data)
+    {
+        return isSysex(data, SYSEX_UNKNOWN);
+    }
+    
+    private static boolean isSysex (final int [] data, final int [] sysex)
+    {
+        if (data.length + 1 < sysex.length)
+            return false;
+
+        for (int i = 0; i < sysex.length; i++)
+        {
+            if (sysex[i] != data[i])
+                return false;
+        }
+
+        return true;
+    }
+    
+    public boolean isJamShiftPressed ()
+    {
+        return this.jamShiftValue;
     }
 }
