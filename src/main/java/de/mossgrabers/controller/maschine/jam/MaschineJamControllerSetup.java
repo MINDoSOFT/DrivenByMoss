@@ -6,9 +6,15 @@ package de.mossgrabers.controller.maschine.jam;
 
 import java.util.function.BooleanSupplier;
 
+import de.mossgrabers.controller.hui.controller.HUIControlSurface;
+import de.mossgrabers.controller.kontrol.mki.command.trigger.Kontrol1CursorCommand;
+import de.mossgrabers.controller.kontrol.mki.controller.Kontrol1ControlSurface;
+import de.mossgrabers.controller.launchkey.controller.LaunchkeyMiniMk3ControlSurface;
 import de.mossgrabers.controller.maschine.jam.command.trigger.JamMetronomeCommand;
+import de.mossgrabers.controller.maschine.jam.command.trigger.MaschineJamCursorCommand;
 import de.mossgrabers.controller.maschine.jam.controller.MaschineJamColorManager;
 import de.mossgrabers.controller.maschine.jam.controller.MaschineJamControlSurface;
+import de.mossgrabers.controller.maschine.jam.mode.BrowseMode;
 import de.mossgrabers.controller.maschine.jam.view.PlayView;
 import de.mossgrabers.controller.maschine.jam.view.SceneView;
 import de.mossgrabers.controller.maschine.mikro.mk3.command.continuous.TouchstripCommand;
@@ -19,7 +25,6 @@ import de.mossgrabers.controller.maschine.mikro.mk3.command.trigger.ProjectButto
 import de.mossgrabers.controller.maschine.mikro.mk3.command.trigger.RibbonCommand;
 import de.mossgrabers.controller.maschine.mikro.mk3.command.trigger.ToggleFixedVelCommand;
 import de.mossgrabers.controller.maschine.mikro.mk3.command.trigger.VolumePanSendCommand;
-import de.mossgrabers.controller.maschine.mikro.mk3.mode.BrowseMode;
 import de.mossgrabers.controller.maschine.mikro.mk3.mode.PositionMode;
 import de.mossgrabers.controller.maschine.mikro.mk3.mode.TempoMode;
 import de.mossgrabers.controller.maschine.mikro.mk3.view.ClipView;
@@ -37,7 +42,9 @@ import de.mossgrabers.framework.command.trigger.application.UndoCommand;
 import de.mossgrabers.framework.command.trigger.clip.NewCommand;
 import de.mossgrabers.framework.command.trigger.clip.NoteRepeatCommand;
 import de.mossgrabers.framework.command.trigger.clip.QuantizeCommand;
+import de.mossgrabers.framework.command.trigger.mode.ModeCursorCommand;
 import de.mossgrabers.framework.command.trigger.mode.ModeSelectCommand;
+import de.mossgrabers.framework.command.trigger.mode.ModeCursorCommand.Direction;
 import de.mossgrabers.framework.command.trigger.transport.MetronomeCommand;
 import de.mossgrabers.framework.command.trigger.transport.PlayCommand;
 import de.mossgrabers.framework.command.trigger.transport.RecordCommand;
@@ -183,8 +190,8 @@ public class MaschineJamControllerSetup extends AbstractControllerSetup<Maschine
         
         modeManager.setDefaultMode (Modes.VOLUME);
         
-        /*
         modeManager.registerMode (Modes.BROWSER, new BrowseMode (surface, this.model));
+        /*
 
         modeManager.registerMode (Modes.PAN, new SelectedPanMode<> (surface, this.model));
         for (int i = 0; i < 8; i++)
@@ -249,6 +256,18 @@ public class MaschineJamControllerSetup extends AbstractControllerSetup<Maschine
 		};
 		
         this.addButton (ButtonID.METRONOME, "Metronome", new JamMetronomeCommand<> (this.model, surface), MaschineJamControlSurface.JAM_LEFT, booleanSupplier);
+        
+        // Browser
+        this.addButton (ButtonID.BROWSE, "Favorites", new BrowserCommand<> (Modes.BROWSER, this.model, surface), MaschineJamControlSurface.JAM_BROWSE, this.model.getBrowser ()::isActive);
+        
+        final MaschineJamCursorCommand commandDown = new MaschineJamCursorCommand (Direction.DOWN, this.model, surface);
+        this.addButton (ButtonID.ARROW_DOWN, "Down", commandDown, MaschineJamControlSurface.JAM_DPAD_DOWN, commandDown::canScroll);
+        final MaschineJamCursorCommand commandUp = new MaschineJamCursorCommand (Direction.UP, this.model, surface);
+        this.addButton (ButtonID.ARROW_UP, "Up", commandUp, MaschineJamControlSurface.JAM_DPAD_TOP, commandUp::canScroll);
+        final MaschineJamCursorCommand commandLeft = new MaschineJamCursorCommand (Direction.LEFT, this.model, surface);
+        this.addButton (ButtonID.ARROW_LEFT, "Left", commandLeft, MaschineJamControlSurface.JAM_DPAD_LEFT, commandLeft::canScroll);
+        final MaschineJamCursorCommand commandRight = new MaschineJamCursorCommand (Direction.RIGHT, this.model, surface);
+        this.addButton (ButtonID.ARROW_RIGHT, "Right", commandRight, MaschineJamControlSurface.JAM_DPAD_RIGHT, commandRight::canScroll);
         
         /*
         this.addButton (ButtonID.STOP, "Stop", new MaschineStopCommand (this.model, surface), MaschineJamControlSurface.JAM_STOP, () -> !t.isPlaying ());
